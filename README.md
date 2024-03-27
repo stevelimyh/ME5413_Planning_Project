@@ -81,8 +81,15 @@ roslaunch me5413_world world.launch
 In the second terminal, launch the path publisher node and the path tracker node:
 
 ```bash
-# Load a map and launch AMCL localizer
+# Load a map and launch AMCL localizer (Pure Pursuit) 
 roslaunch me5413_world path_tracking.launch
+```
+
+alternatively
+
+```bash
+# Load a map and launch AMCL localizer (Provided, Tuned PID-Stanley Controller) 
+roslaunch me5413_world pid_path_tracking.launch
 ```
 
 ![rviz_tracking_image](src/me5413_world/media/rviz_tracking.png)
