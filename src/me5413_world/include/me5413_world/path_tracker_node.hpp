@@ -11,6 +11,7 @@
 #define PATH_TRACKER_NODE_H_
 
 #include <iostream>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -23,6 +24,8 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/TransformStamped.h>
+
+#include <geometry_msgs/Point.h>
 
 #include <tf2/convert.h>
 #include <tf2/LinearMath/Matrix3x3.h>
@@ -50,10 +53,16 @@ class PathTrackerNode
   void robotOdomCallback(const nav_msgs::Odometry::ConstPtr& odom);
   void goalPoseCallback(const geometry_msgs::PoseStamped::ConstPtr& goal_pose);
   void localPathCallback(const nav_msgs::Path::ConstPtr& path);
-
+  
+  geometry_msgs::Point findLookaheadPoint(const geometry_msgs::Point& robot_position, const nav_msgs::Path& path, double lookahead_distance);
+  double distance(const geometry_msgs::Point& p1, const geometry_msgs::Point& p2);
+  double getYawFromQuaternion(const geometry_msgs::Quaternion& quat);
+  geometry_msgs::Twist computeControlOutputs(const nav_msgs::Odometry& odom_robot);
+  
   tf2::Transform convertPoseToTransform(const geometry_msgs::Pose& pose);
-  double computeStanelyControl(const double heading_error, const double cross_track_error, const double velocity);
-  geometry_msgs::Twist computeControlOutputs(const nav_msgs::Odometry& odom_robot, const geometry_msgs::Pose& pose_goal);
+  
+  // double computeStanelyControl(const double heading_error, const double cross_track_error, const double velocity);
+  // geometry_msgs::Twist computeControlOutputs(const nav_msgs::Odometry& odom_robot, const geometry_msgs::Pose& pose_goal);
 
   // ROS declaration
   ros::NodeHandle nh_;
@@ -72,6 +81,7 @@ class PathTrackerNode
   std::string world_frame_;
   std::string robot_frame_;
   nav_msgs::Odometry odom_world_robot_;
+  nav_msgs::Path current_path_;
   geometry_msgs::Pose pose_world_goal_;
 
   // Controllers
