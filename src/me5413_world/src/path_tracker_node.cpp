@@ -16,7 +16,7 @@ namespace me5413_world
 // Dynamic Parameters
 double SPEED_TARGET;
 
-double LOOKAHEAD_DISTANCE, STEERING_GAIN;
+double LOOKAHEAD_DISTANCE, STEERING_GAIN, MAX_STEERING_RATE;
 
 // double PID_Kp, PID_Ki, PID_Kd;
 // double STANLEY_K;
@@ -36,6 +36,10 @@ void dynamicParamCallback(const me5413_world::path_trackerConfig& config, uint32
   // Pure Pursuit
   LOOKAHEAD_DISTANCE = config.lookahead_distance;
   STEERING_GAIN = config.steering_gain;
+  MAX_STEERING_RATE = config.max_steering_rate;
+
+
+  ;
 
   PARAMS_UPDATED = true;
 }
@@ -153,22 +157,21 @@ geometry_msgs::Twist PathTrackerNode::computeControlOutputs(const nav_msgs::Odom
     // Calculate the angle to the lookahead point from the robot's current position
     double angle_to_lookahead = atan2(lookahead_point.y - robot_position.y, lookahead_point.x - robot_position.x);
 
-    // Compute the required change in heading to point towards the lookahead point
     double heading_error = angle_to_lookahead - robot_yaw;
 
-    // Normalize the heading error to be within the range of [-pi, pi]
     heading_error = atan2(sin(heading_error), cos(heading_error));
 
-    // Initialize the command velocity message
     geometry_msgs::Twist cmd_vel;
 
-    // Set the linear velocity to the predetermined speed target
     cmd_vel.linear.x = SPEED_TARGET;
 
-    // The angular velocity is determined by the heading error and a proportional constant 'k'
-    // 'k' is a tuning parameter that may need adjustment based on your robot's handling
-     // This value needs tuning for your specific robot
-    cmd_vel.angular.z = STEERING_GAIN * heading_error;
+    double steering_command = STEERING_GAIN * heading_error;
+
+    if (std::abs(steering_command) > MAX_STEERING_RATE) {
+        steering_command = std::copysign(MAX_STEERING_RATE, steering_command); // Retains the sign of the original command
+    }
+
+    cmd_vel.angular.z = steering_command;
 
     return cmd_vel;
 }
