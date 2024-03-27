@@ -28,6 +28,7 @@ find_package(catkin REQUIRED COMPONENTS
 generate_dynamic_reconfigure_options(
   cfg/path_publisher.cfg
   cfg/path_tracker.cfg
+  cfg/pid_path_tracker.cfg
 )
 
 catkin_package(
@@ -51,3 +52,7 @@ add_dependencies(path_publisher_node ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME
 add_executable(path_tracker_node src/path_tracker_node.cpp)
 target_link_libraries(path_tracker_node ${catkin_LIBRARIES})
 add_dependencies(path_tracker_node ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
+
+add_executable(pid_path_tracker_node src/pid_path_tracker_node.cpp)
+target_link_libraries(pid_path_tracker_node ${catkin_LIBRARIES})
+add_dependencies(pid_path_tracker_node ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
